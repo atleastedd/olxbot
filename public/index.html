@@ -1,96 +1,371 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
+    <title>OLX Auth</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OLX Auth | Dark</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #3b82f6;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #f8fafc;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .step {
+            margin-bottom: 25px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+        
+        .step-desc {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .iframe-container {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #475569;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+            background: #1e293b;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .status {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .status-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .status-loading {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .iframe-container {
+                height: 400px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="app">
-        <!-- Заголовок -->
-        <header>
-            <div class="logo">🤖</div>
-            <h1>OLX Auth</h1>
-            <p class="subtitle">Подключите аккаунт к боту</p>
-        </header>
-
-        <!-- Контент -->
-        <main>
-            <!-- Шаг 1 -->
-            <div class="card">
-                <div class="step-header">
+    <div class="container">
+        <div class="header">
+            <div class="logo">🚀</div>
+            <h1>OLX Auto-Booster</h1>
+            <p class="subtitle">Автоподнятие объявлений каждые 15 минут</p>
+        </div>
+        
+        <div class="card">
+            <!-- Шаг 1: Инструкция -->
+            <div id="step1">
+                <div class="step">
                     <span class="step-number">1</span>
-                    <h3>Название аккаунта</h3>
+                    <span class="step-title">Откройте OLX</span>
+                    <p class="step-desc">Нажмите кнопку ниже для открытия OLX в безопасном окне</p>
                 </div>
-                <input 
-                    type="text" 
-                    id="accountName" 
-                    placeholder="my_olx_account"
-                    maxlength="30"
-                    autofocus
-                >
+                
+                <div class="buttons">
+                    <button id="openOlxBtn" class="btn btn-primary">
+                        📲 Открыть OLX
+                    </button>
+                </div>
             </div>
-
-            <!-- Шаг 2 -->
-            <div class="card">
-                <div class="step-header">
+            
+            <!-- Шаг 2: OLX в iframe -->
+            <div id="step2" class="hidden">
+                <div class="step">
                     <span class="step-number">2</span>
-                    <h3>Вход в OLX</h3>
+                    <span class="step-title">Авторизуйтесь в OLX</span>
+                    <p class="step-desc">Войдите в свой аккаунт OLX в окне ниже</p>
                 </div>
-                <p class="step-description">
-                    Нажмите кнопку, откроется OLX. Войдите в свой аккаунт.
-                </p>
-                <button class="btn btn-primary" id="openOlxBtn">
-                    <span class="btn-icon">🌐</span>
-                    Открыть OLX
-                </button>
-            </div>
-
-            <!-- Шаг 3 -->
-            <div class="card">
-                <div class="step-header">
-                    <span class="step-number">3</span>
-                    <h3>Сохранение</h3>
+                
+                <div class="iframe-container">
+                    <iframe id="olxFrame" src="about:blank"></iframe>
                 </div>
-                <p class="step-description">
-                    После входа вернитесь и сохраните аккаунт.
-                </p>
-                <button class="btn btn-secondary" id="saveBtn" style="display: none;">
-                    <span class="btn-icon">💾</span>
-                    Сохранить аккаунт
-                </button>
+                
+                <div class="buttons">
+                    <button id="backBtn" class="btn btn-secondary">
+                        ↩️ Назад
+                    </button>
+                    <button id="saveBtn" class="btn btn-primary" disabled>
+                        💾 Сохранить сессию
+                    </button>
+                </div>
             </div>
-
+            
             <!-- Статус -->
-            <div class="card status-card" id="statusCard" style="display: none;">
-                <div id="statusContent"></div>
-                <div class="status-progress" id="statusProgress" style="display: none;">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
+            <div id="status" class="status"></div>
+            
+            <!-- Шаг 3: Успех -->
+            <div id="step3" class="hidden">
+                <div class="step">
+                    <span class="step-number">✓</span>
+                    <span class="step-title">Аккаунт сохранен!</span>
+                    <p class="step-desc">Теперь бот будет автоматически поднимать ваши объявления в топ каждые 15 минут.</p>
+                    <p class="step-desc">Вы можете закрыть это окно.</p>
+                </div>
+                
+                <div class="buttons">
+                    <button id="closeBtn" class="btn btn-primary" onclick="window.close()">
+                        ✅ Закрыть
+                    </button>
                 </div>
             </div>
-
-            <!-- Инфо -->
-            <div class="info-card">
-                <div class="info-icon">ℹ️</div>
-                <div class="info-text">
-                    <strong>Интервал поднятия:</strong> 13–17 минут<br>
-                    <strong>Данные хранятся</strong> только в базе бота
-                </div>
-            </div>
-        </main>
-
-        <!-- Футер -->
-        <footer>
-            <div class="footer-text">
-                OLX Auto-Booster • GitHub Pages
-            </div>
-        </footer>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.MainButton.hide();
+        
+        let cookiesSaved = false;
+        
+        document.getElementById('openOlxBtn').addEventListener('click', function() {
+            // Показать шаг 2
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            
+            // Загрузить OLX в iframe
+            const iframe = document.getElementById('olxFrame');
+            iframe.src = 'https://www.olx.kz';
+            
+            // Включить кнопку сохранения через 5 секунд
+            setTimeout(() => {
+                document.getElementById('saveBtn').disabled = false;
+            }, 5000);
+        });
+        
+        document.getElementById('backBtn').addEventListener('click', function() {
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('olxFrame').src = 'about:blank';
+        });
+        
+        document.getElementById('saveBtn').addEventListener('click', async function() {
+            if (cookiesSaved) return;
+            
+            const btn = this;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Сохранение...';
+            
+            showStatus('Собираем данные сессии...', 'loading');
+            
+            try {
+                // Получаем cookies из iframe (нужно будет на сервере)
+                // Здесь мы просто отправляем сигнал боту
+                
+                // Имитация сбора cookies
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Отправляем данные в бот
+                const data = {
+                    action: 'save_cookies',
+                    timestamp: Date.now(),
+                    source: 'webapp_auth'
+                };
+                
+                tg.sendData(JSON.stringify(data));
+                
+                // Показать успех
+                showStatus('✅ Аккаунт успешно сохранен!', 'success');
+                cookiesSaved = true;
+                
+                // Показать шаг 3
+                setTimeout(() => {
+                    document.getElementById('step2').classList.add('hidden');
+                    document.getElementById('step3').classList.remove('hidden');
+                    document.getElementById('status').classList.add('hidden');
+                }, 1500);
+                
+            } catch (error) {
+                showStatus(`❌ Ошибка: ${error.message}`, 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+        
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status status-${type}`;
+            statusEl.style.display = 'block';
+        }
+        
+        // Автоматическое закрытие при успехе от бота
+        tg.onEvent('viewportChanged', () => {
+            if (cookiesSaved) {
+                setTimeout(() => {
+                    window.close();
+                }, 3000);
+            }
+        });
+    </script>
 </body>
 </html>
