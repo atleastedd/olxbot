@@ -3,176 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OLX Авторизация | GitHub Pages</title>
+    <title>OLX Auth | Dark</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        /* Стили такие же как в предыдущей версии */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { background: white; max-width: 400px; margin: 0 auto; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; text-align: center; }
-        .logo { font-size: 40px; margin-bottom: 10px; }
-        .title { font-size: 22px; font-weight: bold; }
-        .subtitle { font-size: 14px; opacity: 0.9; margin-top: 5px; }
-        .content { padding: 25px; }
-        .step { display: flex; align-items: center; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #667eea; }
-        .step-number { width: 30px; height: 30px; background: #667eea; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; }
-        .step-text { flex: 1; font-size: 14px; color: #333; }
-        input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
-        input:focus { outline: none; border-color: #667eea; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 5px 0; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
-        .btn-secondary { background: #f8f9fa; color: #667eea; border: 2px solid #e0e0e0; }
-        .status { padding: 15px; border-radius: 8px; margin: 15px 0; display: none; text-align: center; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
-        .loading { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; display: block; }
-        .note { font-size: 12px; color: #666; text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <div class="app">
+        <!-- Заголовок -->
+        <header>
             <div class="logo">🤖</div>
-            <div class="title">OLX Авторизация</div>
-            <div class="subtitle">GitHub Pages версия</div>
-        </div>
-        
-        <div class="content">
-            <div class="step">
-                <div class="step-number">1</div>
-                <div class="step-text">Введите название для аккаунта</div>
+            <h1>OLX Auth</h1>
+            <p class="subtitle">Подключите аккаунт к боту</p>
+        </header>
+
+        <!-- Контент -->
+        <main>
+            <!-- Шаг 1 -->
+            <div class="card">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <h3>Название аккаунта</h3>
+                </div>
+                <input 
+                    type="text" 
+                    id="accountName" 
+                    placeholder="my_olx_account"
+                    maxlength="30"
+                    autofocus
+                >
             </div>
-            
-            <input type="text" id="accountName" placeholder="Например: Мой OLX" maxlength="30">
-            
-            <div class="step">
-                <div class="step-number">2</div>
-                <div class="step-text">Откройте OLX и войдите в аккаунт</div>
+
+            <!-- Шаг 2 -->
+            <div class="card">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <h3>Вход в OLX</h3>
+                </div>
+                <p class="step-description">
+                    Нажмите кнопку, откроется OLX. Войдите в свой аккаунт.
+                </p>
+                <button class="btn btn-primary" id="openOlxBtn">
+                    <span class="btn-icon">🌐</span>
+                    Открыть OLX
+                </button>
             </div>
-            
-            <button class="btn btn-primary" onclick="openOLX()">
-                <span>🌐</span> Открыть OLX для входа
-            </button>
-            
-            <div class="step">
-                <div class="step-number">3</div>
-                <div class="step-text">После входа вернитесь и сохраните</div>
+
+            <!-- Шаг 3 -->
+            <div class="card">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <h3>Сохранение</h3>
+                </div>
+                <p class="step-description">
+                    После входа вернитесь и сохраните аккаунт.
+                </p>
+                <button class="btn btn-secondary" id="saveBtn" style="display: none;">
+                    <span class="btn-icon">💾</span>
+                    Сохранить аккаунт
+                </button>
             </div>
-            
-            <button class="btn btn-secondary" id="saveBtn" onclick="saveAccount()" style="display: none;">
-                <span>💾</span> Сохранить аккаунт
-            </button>
-            
-            <div id="status" class="status"></div>
-            
-            <div class="note">
-                🔒 Работает на GitHub Pages<br>
-                Данные передаются напрямую в бота
+
+            <!-- Статус -->
+            <div class="card status-card" id="statusCard" style="display: none;">
+                <div id="statusContent"></div>
+                <div class="status-progress" id="statusProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- Инфо -->
+            <div class="info-card">
+                <div class="info-icon">ℹ️</div>
+                <div class="info-text">
+                    <strong>Интервал поднятия:</strong> 13–17 минут<br>
+                    <strong>Данные хранятся</strong> только в базе бота
+                </div>
+            </div>
+        </main>
+
+        <!-- Футер -->
+        <footer>
+            <div class="footer-text">
+                OLX Auto-Booster • GitHub Pages
+            </div>
+        </footer>
     </div>
-    
-    <script>
-        // Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
-        
-        // Получаем параметры из URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('user_id') || 'unknown';
-        const username = urlParams.get('username') || 'user';
-        
-        let olxWindow = null;
-        
-        function showStatus(type, message) {
-            const status = document.getElementById('status');
-            status.className = 'status ' + type;
-            status.textContent = message;
-            status.style.display = 'block';
-        }
-        
-        function openOLX() {
-            const accountName = document.getElementById('accountName').value.trim();
-            
-            if (!accountName) {
-                showStatus('error', '❌ Введите название аккаунта');
-                return;
-            }
-            
-            // Открываем OLX
-            olxWindow = window.open(
-                'https://www.olx.kz/identity/',
-                '_blank'
-            );
-            
-            if (olxWindow) {
-                document.getElementById('saveBtn').style.display = 'flex';
-                showStatus('success', '✅ OLX открыт. Войдите в свой аккаунт.');
-                
-                // Демо-таймер для имитации входа
-                setTimeout(() => {
-                    showStatus('loading', '⏳ Обнаружен вход в аккаунт...');
-                }, 3000);
-                
-                setTimeout(() => {
-                    showStatus('success', '✅ Готово! Теперь сохраните аккаунт.');
-                }, 7000);
-            } else {
-                showStatus('error', '❌ Не удалось открыть окно. Разрешите всплывающие окна.');
-            }
-        }
-        
-        function saveAccount() {
-            const accountName = document.getElementById('accountName').value.trim();
-            
-            if (!accountName) {
-                showStatus('error', '❌ Введите название аккаунта');
-                return;
-            }
-            
-            showStatus('loading', '⏳ Сохраняем аккаунт...');
-            
-            // Создаем демо-куки (в реальном приложении они будут реальными)
-            const demoCookies = [
-                {
-                    name: 'auth_token',
-                    value: 'demo_' + Date.now(),
-                    domain: '.olx.kz',
-                    path: '/',
-                    secure: true,
-                    httpOnly: false
-                }
-            ];
-            
-            // Отправляем данные в бота
-            const data = {
-                user_id: userId,
-                account_name: accountName,
-                cookies: demoCookies,
-                timestamp: new Date().toISOString(),
-                source: 'github_pages'
-            };
-            
-            tg.sendData(JSON.stringify(data));
-            
-            showStatus('success', '✅ Аккаунт сохранен! Закрываем...');
-            
-            // Закрываем WebApp через 2 секунды
-            setTimeout(() => {
-                tg.close();
-            }, 2000);
-        }
-        
-        // Автофокус на поле ввода
-        document.getElementById('accountName').focus();
-        
-        // Enter для открытия OLX
-        document.getElementById('accountName').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') openOLX();
-        });
-    </script>
+
+    <script src="script.js"></script>
 </body>
 </html>
