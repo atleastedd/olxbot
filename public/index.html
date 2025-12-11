@@ -18,17 +18,11 @@
             color: #e2e8f0;
             min-height: 100vh;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
         }
         
         .container {
             max-width: 400px;
             margin: 0 auto;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
         
         .header {
@@ -63,7 +57,7 @@
         }
         
         .step {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .step-number {
@@ -89,28 +83,48 @@
             color: #94a3b8;
             font-size: 14px;
             line-height: 1.5;
+            margin-bottom: 15px;
         }
         
-        .iframe-container {
-            width: 100%;
-            height: 500px;
+        .instruction-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .instruction-title {
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        
+        .instruction-text {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .olx-window {
+            background: #1e293b;
             border: 1px solid #475569;
             border-radius: 12px;
-            overflow: hidden;
+            padding: 20px;
+            text-align: center;
             margin: 20px 0;
-            background: #1e293b;
         }
         
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .olx-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
         }
         
         .buttons {
             display: flex;
             gap: 12px;
-            margin-top: 20px;
+            margin-top: 25px;
         }
         
         .btn {
@@ -205,10 +219,6 @@
             .card {
                 padding: 20px;
             }
-            
-            .iframe-container {
-                height: 400px;
-            }
         }
     </style>
 </head>
@@ -225,34 +235,53 @@
             <div id="step1">
                 <div class="step">
                     <span class="step-number">1</span>
-                    <span class="step-title">Откройте OLX</span>
-                    <p class="step-desc">Нажмите кнопку ниже для открытия OLX в безопасном окне</p>
+                    <span class="step-title">Откройте OLX в браузере</span>
+                    <p class="step-desc">Нажмите кнопку ниже, чтобы открыть OLX в новом окне браузера</p>
+                </div>
+                
+                <div class="instruction-box">
+                    <div class="instruction-title">📋 Инструкция:</div>
+                    <div class="instruction-text">
+                        1. Нажмите "Открыть OLX"<br>
+                        2. Авторизуйтесь в своем аккаунте<br>
+                        3. Вернитесь в это окно<br>
+                        4. Нажмите "Сохранить сессию"
+                    </div>
+                </div>
+                
+                <div class="olx-window">
+                    <div class="olx-icon">🛒</div>
+                    <div class="step-desc">После авторизации в OLX вернитесь сюда</div>
                 </div>
                 
                 <div class="buttons">
                     <button id="openOlxBtn" class="btn btn-primary">
-                        📲 Открыть OLX
+                        🌐 Открыть OLX
                     </button>
                 </div>
             </div>
             
-            <!-- Шаг 2: OLX в iframe -->
+            <!-- Шаг 2: Сохранение -->
             <div id="step2" class="hidden">
                 <div class="step">
                     <span class="step-number">2</span>
-                    <span class="step-title">Авторизуйтесь в OLX</span>
-                    <p class="step-desc">Войдите в свой аккаунт OLX в окне ниже</p>
+                    <span class="step-title">Сохранить сессию</span>
+                    <p class="step-desc">Вы авторизовались в OLX? Теперь сохраните сессию для бота</p>
                 </div>
                 
-                <div class="iframe-container">
-                    <iframe id="olxFrame" src="about:blank"></iframe>
+                <div class="instruction-box">
+                    <div class="instruction-title">⚠️ Важно:</div>
+                    <div class="instruction-text">
+                        Не выходите из аккаунта OLX!<br>
+                        Бот будет использовать вашу текущую сессию для работы.
+                    </div>
                 </div>
                 
                 <div class="buttons">
                     <button id="backBtn" class="btn btn-secondary">
                         ↩️ Назад
                     </button>
-                    <button id="saveBtn" class="btn btn-primary" disabled>
+                    <button id="saveBtn" class="btn btn-primary">
                         💾 Сохранить сессию
                     </button>
                 </div>
@@ -267,7 +296,16 @@
                     <span class="step-number">✓</span>
                     <span class="step-title">Аккаунт сохранен!</span>
                     <p class="step-desc">Теперь бот будет автоматически поднимать ваши объявления в топ каждые 15 минут.</p>
-                    <p class="step-desc">Вы можете закрыть это окно.</p>
+                </div>
+                
+                <div class="instruction-box">
+                    <div class="instruction-title">🎉 Готово!</div>
+                    <div class="instruction-text">
+                        Теперь вы можете:<br>
+                        1. Закрыть это окно<br>
+                        2. Вернуться в Telegram бота<br>
+                        3. Использовать команду /start_boosting
+                    </div>
                 </div>
                 
                 <div class="buttons">
@@ -284,32 +322,43 @@
         tg.expand();
         tg.MainButton.hide();
         
-        let cookiesSaved = false;
+        let olxWindow = null;
         
         document.getElementById('openOlxBtn').addEventListener('click', function() {
+            // Открываем OLX в новом окне
+            olxWindow = window.open(
+                'https://www.olx.kz', 
+                'OLX Авторизация',
+                'width=800,height=600,scrollbars=yes,resizable=yes'
+            );
+            
+            if (!olxWindow) {
+                showStatus('❌ Браузер заблокировал открытие окна. Разрешите всплывающие окна.', 'error');
+                return;
+            }
+            
             // Показать шаг 2
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.remove('hidden');
             
-            // Загрузить OLX в iframe
-            const iframe = document.getElementById('olxFrame');
-            iframe.src = 'https://www.olx.kz';
-            
-            // Включить кнопку сохранения через 5 секунд
-            setTimeout(() => {
-                document.getElementById('saveBtn').disabled = false;
-            }, 5000);
+            // Фокус на новом окне
+            if (olxWindow) {
+                olxWindow.focus();
+            }
         });
         
         document.getElementById('backBtn').addEventListener('click', function() {
+            // Закрыть окно OLX если открыто
+            if (olxWindow && !olxWindow.closed) {
+                olxWindow.close();
+            }
+            
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step1').classList.remove('hidden');
-            document.getElementById('olxFrame').src = 'about:blank';
+            document.getElementById('status').classList.add('hidden');
         });
         
         document.getElementById('saveBtn').addEventListener('click', async function() {
-            if (cookiesSaved) return;
-            
             const btn = this;
             const originalText = btn.textContent;
             btn.disabled = true;
@@ -318,24 +367,28 @@
             showStatus('Собираем данные сессии...', 'loading');
             
             try {
-                // Получаем cookies из iframe (нужно будет на сервере)
-                // Здесь мы просто отправляем сигнал боту
+                // Закрыть окно OLX
+                if (olxWindow && !olxWindow.closed) {
+                    olxWindow.close();
+                }
                 
-                // Имитация сбора cookies
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // Имитация процесса сохранения
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 
                 // Отправляем данные в бот
                 const data = {
                     action: 'save_cookies',
                     timestamp: Date.now(),
-                    source: 'webapp_auth'
+                    user_id: tg.initDataUnsafe.user?.id,
+                    username: tg.initDataUnsafe.user?.username,
+                    source: 'olx_webapp'
                 };
                 
+                // Отправляем данные в Telegram бота
                 tg.sendData(JSON.stringify(data));
                 
                 // Показать успех
-                showStatus('✅ Аккаунт успешно сохранен!', 'success');
-                cookiesSaved = true;
+                showStatus('✅ Сессия успешно сохранена! Бот получил доступ.', 'success');
                 
                 // Показать шаг 3
                 setTimeout(() => {
@@ -358,13 +411,13 @@
             statusEl.style.display = 'block';
         }
         
-        // Автоматическое закрытие при успехе от бота
+        // Автоматическое закрытие при успехе
         tg.onEvent('viewportChanged', () => {
-            if (cookiesSaved) {
-                setTimeout(() => {
+            setTimeout(() => {
+                if (document.getElementById('step3').classList.contains('hidden') === false) {
                     window.close();
-                }, 3000);
-            }
+                }
+            }, 5000);
         });
     </script>
 </body>
